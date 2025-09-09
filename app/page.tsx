@@ -1,16 +1,31 @@
-import Navbar from "@/components/Navbar";
-import Image from "next/image";
+// /app/dashboard/page.tsx
 
-export default function Home() {
+import DashboardHeader from "@/components/Header";
+import StatCard from "@/components/StatCard";
+import RecentPractice from "@/components/RecentPractice";
+import RecommendedPractice from "@/components/RecomendedPractice";
+import SectionTitle from "@/components/SectionTitle";
+import Navbar from "@/components/Navbar";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
+import PixelBlast from "@/components/PixelBlast";
+import Hero from "@/components/Hero";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
+import Dither from "@/components/Dither";
+import { Calendar, Star } from "lucide-react";
+import Button from "@/components/Button";
+import InterviewSection from "@/components/InterviewSection";
+import { Spotlight } from "@/components/ui/spotlight-new";
+
+export default function DashboardPage() {
   return (
-    <main className="relative min-h-svh overflow-hidden">
-      <div className="container mx-auto max-sm:px-2 ">
-        <Navbar/>
-        <div className="w-full border-2 flex-col border-white py-16 p-12 flex justify-center rounded-2xl bg-gradient-to-l from-cyan-400 to-blue-500">
-          <h1 className="text-7xl line-clamp-2 max-w-[800px] font-bold text-white ">Your AI-Powered Interview Partner</h1>
-          <h2 className="text-4xl mt-4">Simulate, analyze, and improve — all in one smart platform.</h2>
-        </div>
+    <div className="min-h-screen pb-20 w-full relative overflow-hidden">
+      <BackgroundRippleEffect cols={54} rows={64} cellSize={112} />
+      <div className="absolute inset-0 "><Spotlight/></div>
+      <div className="container mx-auto px-2">
+        <Navbar />
+        <Hero />
+        <InterviewSection/>
       </div>
-    </main>
+    </div>
   );
 }
