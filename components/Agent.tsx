@@ -3,6 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constans/audio-wave.json";
 import { cn } from "@/lib/utils";
+import { vapi } from "@/lib/vapi.sdk";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -11,16 +14,97 @@ enum CallStatus {
   FINISHED = "FINISHED",
 }
 
-const Agent = ({name} : {name: string | undefined}) => {
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(true);
-  const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.ACTIVE);
-  const messages = [
-    "Whats your name",
-    "my name is Kamal"
-  ]
+interface SavedMessage {
+  role: "user" | "system" | "assistant";
+  content: string;
+}
 
-  const lastMessage = messages[messages.length -1]
+const Agent = ({
+  username,
+  userId,
+  type,
+}: {
+  username: string | undefined;
+  userId: string | undefined;
+  type: string | undefined;
+}) => {
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
+  const [messages, setMessages] = useState<SavedMessage[]>([{role: "assistant", content: `Hi ${username}! Let's start the interview`}]);
+  const router = useRouter()
+
+  
   const lottieRef = useRef<LottieRefCurrentProps>(null);
+
+
+
+  useEffect(() => {
+    const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
+    const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
+
+    const onMessage = (message: Message) => {
+      if (message.type === "transcript" && message.transcriptType === "final") {
+        const newMessage = { role: message.role, content: message.transcript };
+
+        setMessages((prev) => [...prev, newMessage]);
+      }
+    };
+
+    const onSpeechStart = () => setIsSpeaking(true);
+    const onSpeechEnd = () => setIsSpeaking(false);
+
+    const onError = (error: Error) => console.log(error);
+
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("speech-start", onSpeechStart);
+    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("message", onMessage);
+    vapi.on("error", onError);
+
+    return () => {
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("speech-start", onSpeechStart);
+      vapi.off("speech-end", onSpeechEnd);
+      vapi.off("message", onMessage);
+      vapi.off("error", onError);
+    };
+  }, []);
+
+    useEffect(() => {
+    
+    if(callStatus === CallStatus.FINISHED) router.push("/")
+  
+  }, [messages, callStatus, type, userId]);
+
+
+  const handleCall = async () => {
+    navigator.mediaDevices?.enumerateDevices().then((devices) => {
+      const hasMic = devices.some((d) => d.kind === "audioinput");
+
+      if (!hasMic) {
+        toast.error("Microfon Not Found")
+        return
+      }
+    });
+    setCallStatus(CallStatus.CONNECTING)
+
+    await vapi.start( undefined,undefined, undefined, process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+      variableValues: {
+        username, userid: userId
+      }
+    })
+
+    setCallStatus(CallStatus.ACTIVE)
+  }
+
+  const handleDisconnect = async ()=> {
+    setCallStatus(CallStatus.FINISHED)
+    await vapi.stop()
+  }
+
+  const lastMessage = messages[messages.length - 1]?.content;
 
   useEffect(() => {
     if (lottieRef) {
@@ -32,20 +116,25 @@ const Agent = ({name} : {name: string | undefined}) => {
     }
   }, [isSpeaking, lottieRef]);
 
+  
+
   return (
     <div className="flex flex-col">
       <div className="w-full  items-center h-[35rem] flex mt-4 gap-5 justify-between ">
-        <div className="w-1/2 relative max-sm:w-full bg-gradient-to-b from-cyan-950 flex flex-col justify-center items-center to-black rounded-2xl border-2 border-neutral-900 h-[90%]">
+        <div className={cn("w-1/2 relative max-sm:w-full transition-colors duration-1000  flex flex-col justify-center items-center  rounded-2xl border-2 border-neutral-900 h-[90%]", isSpeaking ? "bg-gradient-to-b from-cyan-950 to-black " : "bg-gradient-to-b from-neutral-900 to-black ")}>
+          <div className="absolute inset-0 z-0 ">
+            <img src="/pattern.png" alt="" />
+          </div>
           <img
             src="/chatbot.png"
             alt="AI avatar"
             className={cn(
-              "w-44",
+              "w-44 z-10",
               callStatus === CallStatus.CONNECTING &&
                 "opacity-100 animate-pulse"
             )}
           />
-          <div className="ralative w-full">
+          <div className="ralative z-10 w-full">
             <h1
               className={cn(
                 "text-4xl text-center left-1/2 -translate-x-1/2 absolute font-semibold text-white mt-4 transition-opacity duration-1000",
@@ -56,7 +145,7 @@ const Agent = ({name} : {name: string | undefined}) => {
           </div>
           <div
             className={cn(
-              " transition-opacity duration-1000",
+              " transition-opacity z-10 duration-1000",
               callStatus === CallStatus.ACTIVE ? "opacity-100" : "opacity-0",
               isSpeaking ? "opacity-100" : "opacity-0"
             )}>
@@ -68,18 +157,40 @@ const Agent = ({name} : {name: string | undefined}) => {
             />
           </div>
         </div>
-        <div className="w-1/2 max-sm:hidden bg-gradient-to-b from-neutral-900 to-black rounded-2xl border-2 border-neutral-900 h-[90%] flex flex-col justify-center gap-5 items-center">
-          <div className="w-44 h-44 bg-amber-50 rounded-full"></div>
-          <h1 className="font-semibold text-4xl">{name ?? ""}</h1>
+        <div className="w-1/2 relative max-sm:hidden bg-gradient-to-b from-neutral-900 to-black rounded-2xl border-2 border-neutral-900 h-[90%] flex flex-col justify-center gap-5 items-center">
+           <div className="absolute inset-0 z-0 ">
+            <img src="/pattern.png" alt="" />
+          </div>
+          <div className="w-44 h-44 z-10 bg-amber-50 rounded-full"></div>
+          <h1 className="font-semibold z-10 text-4xl">{username ?? ""}</h1>
         </div>
       </div>
 
       <div className="w-full h-[5rem] bg-gradient-to-b from-neutral-900 to-black rounded-2xl border-2 border-neutral-900 flex justify-center items-center">
-        <p key={lastMessage} className={cn("transition-opacity duration-500 opacity-0", "animate-fadeIn opacity-100")}>{lastMessage}</p>
+        <p
+          key={lastMessage}
+          className={cn(
+            "transition-opacity duration-500 opacity-0",
+            "animate-fadeIn opacity-100"
+          )}>
+          {lastMessage}
+        </p>
       </div>
 
-      <button className={`p-4 w-32 mt-7 mx-auto rounded-full ${callStatus === CallStatus.ACTIVE ? "bg-red-500" : callStatus === CallStatus.CONNECTING ? "bg-amber-500" : "bg-green-500"}`} >
-        {callStatus === CallStatus.ACTIVE ? "End Session" : callStatus === CallStatus.CONNECTING ? "Connecting" : "Start Session"}
+      <button
+      onClick={callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall}
+        className={`p-4 w-32 mt-7 mx-auto rounded-full ${
+          callStatus === CallStatus.ACTIVE
+            ? "bg-red-500"
+            : callStatus === CallStatus.CONNECTING
+            ? "bg-amber-500"
+            : "bg-green-500"
+        }`}>
+        {callStatus === CallStatus.ACTIVE
+          ? "End Session"
+          : callStatus === CallStatus.CONNECTING
+          ? "Connecting"
+          : "Start Session"}
       </button>
     </div>
   );

@@ -38,11 +38,11 @@ const page = async () => {
           transparent
         />
       </div>
-      <div className="container px-4 text-white flex flex-col min-h-screen mx-auto z-40">
+      <div className="container px-4 lg:py-7 text-white flex flex-col min-h-screen mx-auto z-40">
         <Navbar name={user?.name} />
 
         <h1 className="text-4xl font-semibold">Interview Generation</h1>
-        <Agent name={user?.name}/>
+        <Agent username={user?.name} userId={user?.id} type="generate"/>
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ const Hero = () => {
           refine your weaknesses, and walk into any interview with a smile and
           unshakeable confidence.
         </h2>
-       <Button className="max-sm:w-full">Get Started</Button>
+       <Button href="/interview" className="max-sm:w-full">Start an interview</Button>
       </div>
       <div className="z-20 max-sm:hidden flex justify-center items-center">
         <img src="/hero.png" alt="" className="w-72 max-md:w-44 object-cover" />

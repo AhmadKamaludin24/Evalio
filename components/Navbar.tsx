@@ -1,5 +1,6 @@
 "use client"
 import { LogOut } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ const Navbar = ({ name }: { name?: string | undefined }) => {
     });
 
     if (res.ok) {
-      // Arahkan user ke login page
       router.push("/");
       toast.success("sign out success")
     }
@@ -20,7 +20,7 @@ const Navbar = ({ name }: { name?: string | undefined }) => {
   return (
     <div className="w-full z-50 py-7 px-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
-        <img src="/chatbot.png" alt="logo" className="lg:w-12 w-7" />
+        <Link href="/"><img src="/chatbot.png" alt="logo" className="lg:w-12 w-7" /></Link>
         <h1 className="lg:text-4xl text-lg text-white font-bold">Evalio</h1>
       </div>
 
