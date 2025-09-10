@@ -42,7 +42,7 @@ const InterviewCard = [
 const InterviewSection = () => {
   return (
     <div className="mt-7 w-full flex flex-col">
-          <h1 className="text-white text-4xl font-semibold">Popular Interview</h1>
+          <h1 className="text-white text-2xl lg:text-4xl font-semibold">Take Interview</h1>
           <div className="flex flex-wrap items-center mt-7 gap-4 ">
             {InterviewCard.map((interview) => (
               <div

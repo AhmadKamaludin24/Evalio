@@ -120,7 +120,7 @@ export const Spotlight = ({
             width: `${smallWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 right-0 origin-top-right`}
+          className={`absolute pointer-events-auto top-0 right-0 origin-top-right`}
         />
       </motion.div>
     </motion.div>
