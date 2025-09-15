@@ -4,20 +4,31 @@ import { setSessionCookie } from "@/lib/auth.action";
 
 export async function POST(req: Request) {
   try {
-    const { idToken } = await req.json();
+    const { idToken, email } = await req.json();
+    console.log(email)
+    const userRecord = await auth.getUserByEmail(email);
 
-    // ✅ Verifikasi ID Token dulu
+    if (!userRecord) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "User Does not exists. Create an account instead",
+        },
+        { status: 404 }
+      );
+    }
+
     const decoded = await auth.verifyIdToken(idToken, true);
-    const { uid, email } = decoded;
+    const { uid } = decoded;
 
-    // ✅ Baru buat session cookie
+ 
     await setSessionCookie(idToken);
 
     return NextResponse.json({ success: true, uid, email });
   } catch (error: any) {
-    console.error("Sign in error:", error);
+    console.log("Sign in error:", error.message);
     return NextResponse.json(
-      { success: false, message: error.message || "Sign in failed" },
+      { success: false, message: "Sign in failedss" },
       { status: 401 }
     );
   }

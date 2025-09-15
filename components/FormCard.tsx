@@ -22,28 +22,37 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { signIn, signUp } from "@/lib/auth.action";
+import { signUp } from "@/lib/auth.action";
 import { useRouter } from "next/navigation";
 import PixelBlast from "./PixelBlast";
 
-const formSchema = z.object({
-  // username: z.string().min(3).max(20).optional(),
+const signInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6).max(50),
 });
 
+const signUpSchema = signInSchema.extend({
+  username: z.string().min(3).max(20),
+});
+
+type SignInValues = z.infer<typeof signInSchema>;
+type SignUpValues = z.infer<typeof signUpSchema>;
+
 const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: "" },
+  
+  const form = useForm<SignInValues | SignUpValues>({
+    resolver: zodResolver(type === "sign-in" ? signInSchema : signUpSchema),
+    defaultValues:
+      type === "sign-in"
+        ? { email: "", password: "" }
+        : { email: "", password: "", username: "" },
   });
+  
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  async function onSubmit(values: z.infer<typeof form>) {
     if (type === "sign-up") {
-      const { email, password } = values;
+      const { email, password, username } = values as SignUpValues;
 
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
@@ -53,7 +62,7 @@ const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
 
       const result = await signUp({
         uid: userCredentials.user.uid,
-        name: "sfdjkaklsdjf",
+        name: username!,
         email,
         password,
       });
@@ -68,20 +77,26 @@ const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
     } else {
       console.log("Sign In", values);
 
-      const { email, password } = values;
+      const { email, password } = values as SignInValues;
 
       try {
+        
+
         const userCredentials = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
+
+        if (!userCredentials.user.email) {
+          toast.error("user not found, please sign in instead");
+        }
         const idToken = await userCredentials.user.getIdToken();
 
         const res = await fetch("/api/sign-in", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken }),
+          body: JSON.stringify({ idToken, email }),
         });
 
         const data = await res.json();
@@ -93,7 +108,14 @@ const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
         toast.success("Signed In Successfully!");
         router.push("/");
       } catch (error: any) {
-        toast.error(error.message || "Sign in failed");
+        console.log(error.code);
+        switch (error.code) {
+          case "auth/invalid-credential":
+            toast.error("invalid email or password");
+            break;
+          default:
+            toast.error(error.message || "Sign in failed");
+        }
       }
     }
   }
@@ -111,7 +133,7 @@ const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
           </h1>
         </div>
 
-        {/* {type === "sign-up" && (
+        {type === "sign-up" && (
           <FormField
             control={form.control}
             name="username"
@@ -130,7 +152,7 @@ const FormCard = ({ type }: { type: "sign-in" | "sign-up" }) => {
               </FormItem>
             )}
           />
-        )} */}
+        )}
 
         <FormField
           control={form.control}

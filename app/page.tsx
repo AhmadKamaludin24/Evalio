@@ -13,7 +13,7 @@ import { CardSpotlight } from "@/components/ui/card-spotlight";
 import Dither from "@/components/Dither";
 import { Calendar, Star } from "lucide-react";
 import Button from "@/components/Button";
-import InterviewSection from "@/components/InterviewSection";
+import {TakeInterviewSection, InterviewSection} from "@/components/InterviewSection";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { getCurrentUser } from "@/lib/auth.action";
 
@@ -28,7 +28,8 @@ export default async function DashboardPage() {
       <div className="container z-30 mx-auto px-2">
         <Navbar name={user?.name} />
         <Hero />
-        <InterviewSection />
+        <InterviewSection user={user}/>
+      
       </div>
     </div>
   );

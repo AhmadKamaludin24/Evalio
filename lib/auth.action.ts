@@ -79,29 +79,29 @@ export async function setSessionCookie(idToken: string) {
   });
 }
 
-export async function signIn(params: SignInParams) {
-  const { idToken, email } = params;
-  console.log("Sign In Params:", { idToken, email });
+// export async function signIn(params: SignInParams) {
+//   const { idToken, email } = params;
+//   console.log("Sign In Params:", { idToken, email });
 
-  try {
-    const userRecord = await auth.getUserByEmail(email);
+//   try {
+//     const userRecord = await auth.getUserByEmail(email);
 
-    if(!userRecord) {
-        return {
-            success: false,
-            message: 'User Does not exists. Create an account instead'
-        }
-    }
+//     if(!userRecord) {
+//         return {
+//             success: false,
+//             message: 'User Does not exists. Create an account instead'
+//         }
+//     }
 
-    setSessionCookie(idToken)
-  } catch (e: any) {
-    console.log(e)
-    return {
-        success: false,
-        message: "failed to log in into an account"
-    }
-  }
-}
+//     setSessionCookie(idToken)
+//   } catch (e: any) {
+//     console.log(e)
+//     return {
+//         success: false,
+//         message: "failed to log in into an account"
+//     }
+//   }
+// }
 
 
 export async function getCurrentUser(): Promise<User | null> {
@@ -137,3 +137,4 @@ export async function isAuthenticated() {
 
     return !!user
 }
+

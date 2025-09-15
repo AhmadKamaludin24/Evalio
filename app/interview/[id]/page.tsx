@@ -3,11 +3,15 @@ import Navbar from "@/components/Navbar";
 import PixelBlast from "@/components/PixelBlast";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { getCurrentUser } from "@/lib/auth.action";
+import { getInterviewById } from "@/lib/general.action";
 import React from "react";
 
-const page = async () => {
-  
+const page = async ({params}: {params: {id: string}}) => {
+  const {id} = await params
+  console.log(id)
+
   const user = await getCurrentUser();
+  const interview = await getInterviewById(id)
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden bg-gradient-to-b from-black via-black to-blue-950">
@@ -42,8 +46,8 @@ const page = async () => {
       <div className="container px-4 text-white flex flex-col mx-auto z-40">
         <Navbar name={user?.name} />
 
-        <h1 className="text-4xl font-semibold">Interview Generation</h1>
-        <Agent username={user?.name} userId={user?.id} type="generate"/>
+        <h1 className="text-4xl max-sm:text-2xl font-semibold">{interview?.role} Interview</h1>
+        <Agent username={user?.name} userId={user?.id} questions={interview?.questions } interviewId={id} type="interview"/>
       </div>
     </div>
   );
