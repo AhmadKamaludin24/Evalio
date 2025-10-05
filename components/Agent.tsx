@@ -162,7 +162,7 @@ const Agent = ({
 
   return (
     <div className="flex flex-col">
-      <div className="w-full  items-center h-[35rem] max-sm:h-[27rem] flex mt-4 max-sm:mt-1 gap-5 justify-between ">
+      <div className="w-full  items-center h-[35rem] max-sm:h-[20rem] flex mt-4 max-sm:mt-1 gap-5 justify-between ">
         <div
           className={cn(
             "w-1/2 relative max-sm:w-full transition-colors duration-1000  flex flex-col justify-center items-center  rounded-2xl border-2 border-neutral-900 h-[90%]",
