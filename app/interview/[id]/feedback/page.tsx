@@ -25,7 +25,7 @@ const Feedback = async ({ params }: RouteParams) => {
   });
 
   return (
-    <section className="section-feedback bg-gradient-to-b from-black via-black to-blue-950 text-white p-4">
+    <section className="min-h-svh relative overflow-hidden bg-gradient-to-b from-black via-black to-blue-950 text-white p-4">
       <Spotlight/>
       <div className="flex flex-row justify-center p-7">
         <h1 className="text-4xl text-center font-semibold">

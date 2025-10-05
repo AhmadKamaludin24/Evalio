@@ -14,7 +14,7 @@ const page = async ({params}: {params: {id: string}}) => {
   const interview = await getInterviewById(id)
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden bg-gradient-to-b from-black via-black to-blue-950">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-b from-black via-black to-blue-950">
       <Spotlight />
       <div
         style={{

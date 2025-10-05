@@ -119,7 +119,7 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
-      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+      await vapi.start(undefined, undefined, undefined ,process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
         variableValues: {
           username: username,
           userid: userId,
@@ -162,7 +162,7 @@ const Agent = ({
 
   return (
     <div className="flex flex-col">
-      <div className="w-full  items-center h-[35rem] max-sm:h-[20rem] flex mt-4 max-sm:mt-1 gap-5 justify-between ">
+      <div className="w-full  items-center h-[35rem] max-sm:h-[27rem] flex mt-4 max-sm:mt-1 gap-5 justify-between ">
         <div
           className={cn(
             "w-1/2 relative max-sm:w-full transition-colors duration-1000  flex flex-col justify-center items-center  rounded-2xl border-2 border-neutral-900 h-[90%]",
@@ -229,7 +229,7 @@ const Agent = ({
         onClick={
           callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall
         }
-        className={`p-4 w-32 mt-7 mx-auto rounded-full ${
+        className={`p-4 max-sm:p-3 max-sm:text-sm w-32 mt-7 mx-auto rounded-full ${
           callStatus === CallStatus.ACTIVE
             ? "bg-red-500"
             : callStatus === CallStatus.CONNECTING
