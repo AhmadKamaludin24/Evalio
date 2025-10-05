@@ -9,6 +9,8 @@ import {
 } from "@/lib/general.action";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth.action";
+import { Calendar, Star } from "lucide-react";
+import { Spotlight } from "@/components/ui/spotlight-new";
 
 const Feedback = async ({ params }: RouteParams) => {
   const { id } = await params;
@@ -23,19 +25,20 @@ const Feedback = async ({ params }: RouteParams) => {
   });
 
   return (
-    <section className="section-feedback">
-      <div className="flex flex-row justify-center">
-        <h1 className="text-4xl font-semibold">
+    <section className="section-feedback bg-gradient-to-b from-black via-black to-blue-950 text-white p-4">
+      <Spotlight/>
+      <div className="flex flex-row justify-center p-7">
+        <h1 className="text-4xl text-center font-semibold">
           Feedback on the Interview -{" "}
           <span className="capitalize">{interview.role}</span> Interview
         </h1>
       </div>
 
-      <div className="flex flex-row justify-center ">
+      <div className="flex flex-row justify-center mb-4 ">
         <div className="flex flex-row gap-5">
           {/* Overall Impression */}
           <div className="flex flex-row gap-2 items-center">
-            <Image src="/star.svg" width={22} height={22} alt="star" />
+            <Star/>
             <p>
               Overall Impression:{" "}
               <span className="text-primary-200 font-bold">
@@ -47,7 +50,7 @@ const Feedback = async ({ params }: RouteParams) => {
 
           {/* Date */}
           <div className="flex flex-row gap-2">
-            <Image src="/calendar.svg" width={22} height={22} alt="calendar" />
+            <Calendar/>
             <p>
               {feedback?.createdAt
                 ? dayjs(feedback.createdAt).format("MMM D, YYYY h:mm A")
@@ -59,10 +62,10 @@ const Feedback = async ({ params }: RouteParams) => {
 
       <hr />
 
-      <p>{feedback?.finalAssessment}</p>
+      <p className="mt-3">{feedback?.finalAssessment}</p>
 
       {/* Interview Breakdown */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-4">
         <h2>Breakdown of the Interview:</h2>
         {feedback?.categoryScores?.map((category, index) => (
           <div key={index}>
@@ -92,8 +95,8 @@ const Feedback = async ({ params }: RouteParams) => {
         </ul>
       </div>
 
-      <div className="buttons">
-        <Button className="btn-secondary flex-1">
+      <div className="mt-4 flex flex-row justify-center items-center gap-4">
+        <Button className="bg-white text-black flex-1">
           <Link href="/" className="flex w-full justify-center">
             <p className="text-sm font-semibold text-primary-200 text-center">
               Back to dashboard
@@ -101,7 +104,7 @@ const Feedback = async ({ params }: RouteParams) => {
           </Link>
         </Button>
 
-        <Button className="btn-primary flex-1">
+        <Button className="bg-white text-blackflex-1">
           <Link
             href={`/interview/${id}`}
             className="flex w-full justify-center"
